@@ -27,6 +27,17 @@ sudo --user builder \
     --noconfirm --noview \
     --database aurci2 --root /local_repository \
     $packages_with_aur_dependencies
+    
+cd /local_repository
+shopt -s nullglob
+for file in *:*pkg.tar*; do
+    echo "Detected colon in filename: $file"
+    new_name="${file//:/.}"
+    echo "Renaming to: $new_name"
+    mv "$file" "$new_name"
+    sudo --user builder repo-add aurci2.db.tar.gz "$new_name"
+done
+shopt -u nullglob
 
 # Move the local repository to the workspace.
 if [ -n "$GITHUB_WORKSPACE" ]
